@@ -1,6 +1,7 @@
 # ICST Ambisonics Plugins CMakeLists.txt
 
 cmake_minimum_required(VERSION 3.15)
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 if(APPLE)
     set( CMAKE_OSX_ARCHITECTURES "x86_64;arm64" CACHE STRING "" )
@@ -11,8 +12,8 @@ if(APPLE)
     endif()
 endif()
 
-project(ICST_AMBISONICS_PLUGINS 
-    VERSION 0.0.0.1 #version_replacement_tag#
+project(RTELECTRONIX_AMBISONIC_PLUGINS 
+    VERSION 0.0.1 #version_replacement_tag#
 )
 
 set( COMMON_OUTPUT_DIRECTORY
@@ -35,10 +36,15 @@ set(COMMON_PLUGIN_SETTINGS
     # EDITOR_WANTS_KEYBOARD_FOCUS TRUE/FALSE    # Does the editor need keyboard focus?
     # COPY_PLUGIN_AFTER_BUILD TRUE/FALSE        # Should the plugin be installed to a default location after building?
     PLUGIN_MANUFACTURER_CODE "ICST"               # A four-character manufacturer id with at least one upper-case character
-    FORMATS AU VST3 LV2                # The formats to build. Other valid formats are: AAX Unity VST AU AUv3
+    FORMATS Standalone AU VST3 LV2                # The formats to build. Other valid formats are: AAX Unity VST AU AUv3
     AU_MAIN_TYPE kAudioUnitType_Effect
     NEEDS_WEB_BROWSER TRUE
 )
+
+add_library(asio_sdk INTERFACE)
+target_include_directories(asio_sdk INTERFACE 
+    C:/Users/nate/source/Juce/asiosdk_2.3.3_2019-06-14/common)
+target_compile_definitions(asio_sdk INTERFACE -DJUCE_ASIO=1)
 
 set(COMMON_LINK_LIBRARIES
     PRIVATE
@@ -55,13 +61,18 @@ set(COMMON_LINK_LIBRARIES
     juce::juce_dsp
     juce::juce_audio_formats
     juce::juce_javascript
+    asio_sdk
 
     PUBLIC
     juce::juce_recommended_config_flags
     juce::juce_recommended_lto_flags
     juce::juce_recommended_warning_flags
 )
-add_subdirectory(JUCE)                    
 
+add_subdirectory(JUCE)
+add_subdirectory(Libraries/RT-CorePlatform)         
+add_subdirectory(Libraries/RT-DSP) 
+add_subdirectory(Panner)
 add_subdirectory(Encoder)
 add_subdirectory(Decoder)
+add_subdirectory(PlugFilterCreator)

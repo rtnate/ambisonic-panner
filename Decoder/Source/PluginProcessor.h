@@ -98,15 +98,21 @@ public:
     ChannelLayout* getChannelLayout();
     RadarOptions* getRadarOptions();
     
+    void enableGainTruncation(bool toEnable = true)
+    {
+      jassert(gainTruncationEnabled);
+      *gainTruncationEnabled = toEnable;
+      //if (toEnable) getAmbiSettings()->setMultiDecoderFlag(false);
+    }
 private:
     ScalingInfo scalingInfo;
     std::unique_ptr<AmbiSpeakerSet> speakerSet;
-	std::unique_ptr<AmbiSourceSet> movingPoints;
-	AmbiSettingsCollection ambiSettings;
-	DecoderSettings decoderSettings;
-	TestSoundGenerator* pTestSoundGenerator;
-	OwnedArray<DelayBuffer> delayBuffers;
-	DelayHelper delayHelper;
+	  std::unique_ptr<AmbiSourceSet> movingPoints;
+	  AmbiSettingsCollection ambiSettings;
+	  DecoderSettings decoderSettings;
+	  TestSoundGenerator* pTestSoundGenerator;
+	  OwnedArray<DelayBuffer> delayBuffers;
+	  DelayHelper delayHelper;
     std::unique_ptr<SpeakerPresetHelper> speakerPresetHelper;
     std::unique_ptr<DecodingPresetHelper> decodingPresetHelper;
     std::unique_ptr<ZoomSettings> zoomSettings;
@@ -119,6 +125,8 @@ private:
     FilterBankInfo bFormatFilterInfo[MAX_NB_OF_DECODER_SECTIONS];
     dsp::ProcessSpec speakerIIRFilterSpec;
     dsp::ProcessSpec bFormatIIRFilterSpec;
+
+    std::unique_ptr<AudioParameterBool> gainTruncationEnabled;
     
 
 	//==============================================================================

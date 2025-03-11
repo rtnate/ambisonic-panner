@@ -29,6 +29,47 @@
 #define XML_TAG_ENCODER_ANIMATOR "Animator"
 #define XML_ATTRIBUTE_VERSION "AmbiPluginVersion"
 
+//ENCODER 
+template<typename FloatType>
+FloatType truncateGainToQuarterDB(FloatType gain)
+{
+  if (approximatelyEqual(gain, (FloatType)0.)) return 0.;
+  auto decibels = juce::Decibels::gainToDecibels(std::abs(gain));
+  decibels *= (FloatType)4.0;
+  decibels = std::round(decibels);
+  decibels /= (FloatType)4.0;
+  auto outGain = juce::Decibels::decibelsToGain(decibels);
+  outGain  = std::copysign(outGain, gain);
+  return outGain;
+}
+
+static float truncateGain(float gain)
+{
+  //Old implementation - save for reference
+  //float g = std::fabs(gain) + 1.0e-30f;
+  //float db = 20.f * std::log10(g);
+  //float rounded = std::round(db * 4.f) * 0.25f;
+  //constexpr double EXP_CONV = 0.16609640474436811739351597147447;
+  //float outGain = std::exp2f(db * (float)EXP_CONV);
+  //return std::copysignf(outGain, gain);
+  float absGain = std::fabs(gain);
+  float db = 20.f * std::log10f(absGain);
+
+  // Clamp to -100 dB
+  //float clampedDB = (db < -100.0f) ? -100.0f : db;
+  //float shouldZero = (db < -100.0f) ? -100.0f : db;
+
+  // Round to 0.25 dB (using integer trick)
+  int roundedDBInt = static_cast<int>(db * 4.0f + 0.5f);
+  float roundedDB = static_cast<float>(roundedDBInt) * 0.25f;
+
+  // Gain Reconversion
+  constexpr double EXP_CONV = 0.16609640474436811739351597147447;
+  float outGain = std::exp2f(roundedDB * (float)EXP_CONV);
+
+  return std::copysignf(outGain, gain);
+}
+
 //==============================================================================
 AmbisonicEncoderAudioProcessor::AmbisonicEncoderAudioProcessor()
      : AudioProcessor (BusesProperties() // workaround for VST3 (for some strange reason, 64 channels are only allowed if not initialized with 64)
@@ -88,6 +129,9 @@ AmbisonicEncoderAudioProcessor::AmbisonicEncoderAudioProcessor()
     radarOptions.checkNameFieldEditable = !MULTI_ENCODER_MODE;
     radarOptions.allowGroup = MULTI_ENCODER_MODE;
     radarOptions.allowDelete = MULTI_ENCODER_MODE;
+
+    gainTruncationEnabled = std::make_unique<AudioParameterBool>("ambiencoder-gain-trunc",
+      "Encoder Gain Truncation", false);
 }
 
 AmbisonicEncoderAudioProcessor::~AmbisonicEncoderAudioProcessor()
@@ -233,7 +277,8 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
     const float masterGainFactor = float(Decibels::decibelsToGain(sources->getMasterGain()));
 	const int totalNumInputChannels = jmin(getTotalNumInputChannels(), sources->size(), buffer.getNumChannels());
 	const int totalUsedOutputChannels = jmin(getTotalNumOutputChannels(), encoderSettings.getAmbiChannelCount(), buffer.getNumChannels());
-	double currentCoefficients[64];
+	const bool shouldTruncateGain = *gainTruncationEnabled;
+  double currentCoefficients[64];
 	float* outputBufferPointers[64];
 	int iChannel;
 	AudioSampleBuffer inputBuffer;
@@ -291,7 +336,7 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
 		sources->setRms(iSource, inputBuffer.getRMSLevel(iSource, 0, inputBuffer.getNumSamples()), encoderSettings.oscSendFlag);
 
 		// calculate ambisonics coefficients
-        memset(currentCoefficients, 0, 64 * sizeof(double));
+    memset(currentCoefficients, 0, 64 * sizeof(double));
 		sourcePoint.getAmbisonicsCoefficients(encoderSettings.getAmbiChannelCount(), &currentCoefficients[0], true, true);
 		applyDistanceGain(&currentCoefficients[0], 64, sourcePointDistance);
 		
@@ -314,7 +359,16 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
 			double fractionNew = 1.0 / numSamples * iSample;
 			double fractionOld = 1.0 - fractionNew;
 			for (iChannel = 0; iChannel < totalUsedOutputChannels; iChannel++)
-				outputBufferPointers[iChannel][iSample] += sourceGain * masterGainFactor * float(inputData[iSample] * (fractionNew * currentCoefficients[iChannel] + fractionOld * lastCoefficients[iSource][iChannel]));
+      {
+        double sampleGain = sourceGain * masterGainFactor;
+        double coefGain = fractionNew * currentCoefficients[iChannel] + 
+                          fractionOld * lastCoefficients[iSource][iChannel];
+        double s = inputData[iSample];
+        double sGain = sampleGain * coefGain;
+        if (shouldTruncateGain) sGain = truncateGain(sGain);
+        outputBufferPointers[iChannel][iSample] += (float)(s * sGain);
+      }
+				
 		}
 
 		// keep coefficients
@@ -503,7 +557,11 @@ void AmbisonicEncoderAudioProcessor::actionListenerCallback(const juce::String &
 
 //==============================================================================
 // This creates new instances of the plugin..
+#if !(JUCE_DONT_EMIT_CREATE_PLUGIN_FILTER)
+
 AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new AmbisonicEncoderAudioProcessor();
 }
+
+#endif

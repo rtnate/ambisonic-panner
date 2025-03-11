@@ -2,3 +2,12 @@
 	path = JUCE
 	url = https://github.com/juce-framework/JUCE.git
 	branch = master
+[submodule "Libraries/RTJuceGUI"]
+	path = Libraries/RTJuceGUI
+	url = git@github.com:rtnate/RTJuceGUI.git
+[submodule "Libraries/RT-DSP"]
+	path = Libraries/RT-DSP
+	url = git@github.com:rtnate/RT-DSP.git
+[submodule "Libraries/RT-CorePlatform"]
+	path = Libraries/RT-CorePlatform
+	url = git@github.com:rtnate/RT-CorePlatform.git

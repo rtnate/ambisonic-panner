@@ -90,13 +90,13 @@ public:
     void actionListenerCallback(const juce::String &message) override;
     
     ChannelLayout* getChannelLayout();
-	AmbiSourceSet* getSources();
-	EncoderSettings* getEncoderSettings();
-	void initializeOscSender();
+	  AmbiSourceSet* getSources();
+	  EncoderSettings* getEncoderSettings();
+	  void initializeOscSender();
     void initializeAudioParameter();
-	AudioParams* getAudioParams();
-	StatusMessageHandler* getStatusMessageHandler();
-	DawParameter* getDawParameter();
+	  AudioParams* getAudioParams();
+	  StatusMessageHandler* getStatusMessageHandler();
+	  DawParameter* getDawParameter();
     EncoderPresetHelper* getPresetHelper();
     DistanceEncodingPresetHelper* getDistanceEncodingPresetHelper();
     CustomOscRxPresetHelper* getCustomOscRxPresetHelper();
@@ -108,6 +108,12 @@ public:
     RadarOptions* getRadarOptions();
     
 	void updateTrackProperties(const TrackProperties& properties) override;
+
+  void enableGainTruncation(bool toEnable = true)
+  {
+    jassert(gainTruncationEnabled);
+    *gainTruncationEnabled = toEnable;
+  }
 
 private:
 	std::unique_ptr<AmbiSourceSet> sources;
@@ -132,6 +138,8 @@ private:
     AnimatorDataset animatorDataset;
     ChannelLayout channelLayout;
     RadarOptions radarOptions;
+
+    std::unique_ptr<AudioParameterBool> gainTruncationEnabled;
     
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AmbisonicEncoderAudioProcessor)
