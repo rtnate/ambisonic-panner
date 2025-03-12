@@ -56,6 +56,8 @@ AmbisonicPannerAudioProcessorEditor::AmbisonicPannerAudioProcessorEditor(Ambison
 
 AmbisonicPannerAudioProcessorEditor::~AmbisonicPannerAudioProcessorEditor()
 {
+  audioProcessor.removeChangeListener(this);
+  audioProcessor.getDecoder().getSpeakerPresetHelper()->removeActionListener(this);
   setLookAndFeel(nullptr);
 }
 

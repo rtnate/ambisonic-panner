@@ -34,7 +34,7 @@ void Panner3DGroup::resized()
     FlexBox::JustifyContent::center);
   jassert(threeDPanner);
   auto layoutBounds = bounds.reduced(10.f).withTrimmedTop(10.f);
-  auto square = jmin(layoutBounds.getHeight(), layoutBounds.getWidth()) - 10.f;
+  //auto square = jmin(layoutBounds.getHeight(), layoutBounds.getWidth()) - 10.f;
   FlexItem flexPanner(*threeDPanner);
   flexPanner.height = layoutBounds.getHeight();
   flexPanner.width = layoutBounds.getWidth();

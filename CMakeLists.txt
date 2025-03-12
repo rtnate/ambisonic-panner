@@ -70,8 +70,7 @@ set(COMMON_LINK_LIBRARIES
 )
 
 add_subdirectory(JUCE)
-add_subdirectory(Libraries/RT-CorePlatform)         
-add_subdirectory(Libraries/RT-DSP) 
+add_subdirectory(Libraries)
 add_subdirectory(Panner)
 add_subdirectory(Encoder)
 add_subdirectory(Decoder)

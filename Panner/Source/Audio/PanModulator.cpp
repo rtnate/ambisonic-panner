@@ -6,10 +6,10 @@ using namespace juce::dsp;
 void PanModulator::processBlock(const InputBlock& input, OutputBlock& output) noexcept
 {
   intermediate.clear();
-  auto block = intermediate.getSubBlock(0, output.getNumSamples());
-  ProcessContextReplacing ctx(block.getSingleChannelBlock(0));
+  AudioBlock<float> block = intermediate.getSubBlock(0, output.getNumSamples());
+  ProcessContextReplacing<float> ctx(block.getSingleChannelBlock(0));
   lfo.process(ctx);
-  ProcessContextReplacing ctx2(block.getSingleChannelBlock(1));
+  ProcessContextReplacing<float> ctx2(block.getSingleChannelBlock(1));
   rotLfo.process(ctx2);
   jassert(input.getNumChannels() >= 2);
   jassert(output.getNumChannels() >= 2);

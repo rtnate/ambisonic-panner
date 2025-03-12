@@ -19,7 +19,7 @@ MainPannerComponent::MainPannerComponent(AmbisonicPannerAudioProcessor& ap): pro
 
 MainPannerComponent::~MainPannerComponent()
 {
-
+  autopan->removeChangeListener(this);
 }
 
 void MainPannerComponent::resized()

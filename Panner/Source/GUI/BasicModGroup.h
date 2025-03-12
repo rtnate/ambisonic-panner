@@ -57,7 +57,7 @@ class BasicModGroup : public juce::GroupComponent, public juce::ChangeBroadcaste
     float getFaderValue(FaderID faderId) const noexcept
     {
       auto fader = m_faders[faderId];
-      if (fader != nullptr) return fader->getValue();
+      if (fader != nullptr) return (float)fader->getValue();
       else return 0.f;
     }
 

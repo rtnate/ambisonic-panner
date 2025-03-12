@@ -7,10 +7,10 @@ using namespace RTJuceGUI;
 
 LFOSingleController::LFOSingleController(juce::String name) : juce::GroupComponent()
 {
-  wchar_t space = '\s';
-  String componentName = name.toLowerCase().replaceCharacter(space, '_');
-  componentName = "lfo-controller-" + componentName;
-  setName(componentName);
+  constexpr wchar_t space = L'\x20';
+  String cmpName = name.toLowerCase().replaceCharacter(space, '_');
+  cmpName = "lfo-controller-" + cmpName;
+  setName(cmpName);
   lfoLabel = std::make_unique<juce::Label>();
   lfoLabel->setText(name, dontSendNotification);
   lfoLabel->setJustificationType(Justification::centred);

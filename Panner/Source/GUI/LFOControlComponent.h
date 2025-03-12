@@ -26,7 +26,7 @@ class LFOSingleController : public juce::GroupComponent
     }
 
     float getRate() const noexcept {
-      return rateKnob->getValue();
+      return (float)rateKnob->getValue();
     }
 
     int getWaveform() const noexcept

@@ -31,7 +31,7 @@ class AutoPanComponent : public juce::Component, public juce::ChangeBroadcaster
 
     float getRateSetting()
     {
-      return quickRateKnob->getValue();
+      return (float)quickRateKnob->getValue();
     }
 
     void setRateSetting(float rate, bool sendNotificaiton)

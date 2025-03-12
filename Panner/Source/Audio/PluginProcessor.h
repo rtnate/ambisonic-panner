@@ -8,13 +8,14 @@
 
 #pragma once
 
-#include <JuceHeader.h>
+
 #include "Encoder/Source/PluginProcessor.h"
 #include "Decoder/Source/PluginProcessor.h"
 #include "Audio/AudioMeterProcessor.h"
 #include "Audio/AudioMeterParameterGroup.h"
 #include "PanModulator.h"
 #include "PanParameters.h"
+#include <JuceHeader.h>
 //==============================================================================
 class AmbisonicPannerAudioProcessor  : public juce::AudioProcessor,
                                        public juce::ChangeBroadcaster,

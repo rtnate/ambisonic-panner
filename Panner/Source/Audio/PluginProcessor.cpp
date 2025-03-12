@@ -8,7 +8,8 @@
 
 #include "Audio/PluginProcessor.h"
 #include "GUI/PluginEditor.h"
-#include "RT-DSP/Dynamics/GainConverter.h"
+//#include "RT-DSP/Dynamics/GainConverter.h"
+#include <JuceHeader.h>
 
 using namespace juce;
 //==============================================================================
@@ -46,7 +47,7 @@ AmbisonicPannerAudioProcessor::~AmbisonicPannerAudioProcessor()
 //==============================================================================
 const juce::String AmbisonicPannerAudioProcessor::getName() const
 {
-    return JucePlugin_Name;
+    return "AmbisonicPanner";//JucePlugin_Name;
 }
 
 bool AmbisonicPannerAudioProcessor::acceptsMidi() const
@@ -220,6 +221,7 @@ void AmbisonicPannerAudioProcessor::processBlock (juce::AudioBuffer<float>& buff
     intermediateBuffer->clear();
     //Copy Channel 1 to the input
     intermediateBuffer->copyFrom(0, 0, buffer, 0, 0, currentBlockSize);
+    auto rms = intermediateBuffer->getRMSLevel(0, 0, currentBlockSize);
     jassert(encoderProc);
     encoderProc->processBlock(*intermediateBuffer, midiMessages);
     jassert(decoderProc);
@@ -228,13 +230,13 @@ void AmbisonicPannerAudioProcessor::processBlock (juce::AudioBuffer<float>& buff
     jassert(meterParams);
     bool metersOn = getMeterSources().metersEnabled();
     if (metersOn) {
-      auto data = intermediateBuffer->getArrayOfWritePointers();
-      dsp::AudioBlock<float> meterAudio(data, 16, currentBlockSize);
+      auto meterData = intermediateBuffer->getArrayOfWritePointers();
+      dsp::AudioBlock<float> meterAudio(meterData, 16, currentBlockSize);
       dsp::ProcessContextReplacing<float> ctx(meterAudio);
       meterProc->process(ctx);
       for (int i = 0; i < 16; i++)
       {
-        auto data = meterProc->getLastOutput(i);
+        auto data = meterProc->getLastOutput(i);;
         auto meter = meterParams->getChannel(i);
         if (data != nullptr && meter != nullptr)
         {
@@ -283,11 +285,6 @@ void AmbisonicPannerAudioProcessor::setStateInformation (const void* data, int s
 }
 
 //==============================================================================
-// This creates new instances of the plugin..
-juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
-{
-    return new AmbisonicPannerAudioProcessor();
-}
 
 void AmbisonicPannerAudioProcessor::setSpeakerSet(StandardSpeakerSet set)
 {
@@ -359,3 +356,12 @@ void AmbisonicPannerAudioProcessor::actionListenerCallback(const String& message
 {
 
 }
+
+#if !(JUCE_DONT_EMIT_CREATE_PLUGIN_FILTER)
+
+AudioProcessor* JUCE_CALLTYPE createPluginFilter()
+{
+  return new AmbisonicPannerAudioProcessor();
+}
+
+#endif

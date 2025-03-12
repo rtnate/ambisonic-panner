@@ -22,12 +22,20 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 
 #elif PLUGIN_IS_AMBI_PANNER 
 
+#include "Panner/Source/Audio/PluginProcessor.h"
+
+juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
+{
+  return new AmbisonicPannerAudioProcessor();
+}
+
 #else 
 
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return nullptr;
 }
+
 #endif
 
 

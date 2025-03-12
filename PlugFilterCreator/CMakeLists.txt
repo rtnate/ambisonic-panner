@@ -50,10 +50,12 @@ target_link_libraries(AmbiEncoderMulti_LV2 PRIVATE AmbiEncoder_PlugCreator)
 target_link_libraries(AmbiEncoderMulti_Standalone PRIVATE AmbiEncoder_PlugCreator)
 target_link_libraries(AmbiEncoderMulti_VST3 PRIVATE AmbiEncoder_PlugCreator)
 
+
 target_link_libraries(AmbiEncoderSolo PUBLIC PlugFilterCreator_Helper)
 target_link_libraries(AmbiEncoderSolo_LV2 PRIVATE AmbiEncoder_PlugCreator)
 target_link_libraries(AmbiEncoderSolo_Standalone PRIVATE AmbiEncoder_PlugCreator)
 target_link_libraries(AmbiEncoderSolo_VST3 PRIVATE AmbiEncoder_PlugCreator)
+
 
 target_link_libraries(AmbiDecoder PUBLIC PlugFilterCreator_Helper)
 target_link_libraries(AmbiDecoder_PlugCreator PRIVATE AmbiDecoder)
@@ -61,6 +63,19 @@ target_link_libraries(AmbiDecoder_LV2 PRIVATE AmbiDecoder_PlugCreator)
 target_link_libraries(AmbiDecoder_Standalone PRIVATE AmbiDecoder_PlugCreator)
 target_link_libraries(AmbiDecoder_VST3 PRIVATE AmbiDecoder_PlugCreator)
 
+
+target_link_libraries(AmbisonicPanner PUBLIC PlugFilterCreator_Helper)
+target_link_libraries(AmbiPanner_PlugCreator PRIVATE AmbisonicPanner)
+target_link_libraries(AmbisonicPanner_LV2 PRIVATE AmbiPanner_PlugCreator)
+target_link_libraries(AmbisonicPanner_Standalone PRIVATE AmbiPanner_PlugCreator)
+target_link_libraries(AmbisonicPanner_VST3 PRIVATE AmbiPanner_PlugCreator)
+
+if(APPLE)
+target_link_libraries(AmbiEncoderMulti_AU PRIVATE AmbiEncoder_PlugCreator)
+target_link_libraries(AmbiEncoderSolo_AU PRIVATE AmbiEncoder_PlugCreator)
+target_link_libraries(AmbiDecoder_AU PRIVATE AmbiDecoder_PlugCreator)
+target_link_libraries(AmbisonicPanner_AU PRIVATE AmbiPanner_PlugCreator)
+endif()
 #target_link_libraries(AmbiDecoder PUBLIC PlugFilterCreator_Helper)
 #target_link_libraries(AmbiDecoder_LV2 PRIVATE AmbiDecoder_PlugCreator)
 #target_link_libraries(AmbiDecoder_Standalone PRIVATE AmbiDecoder_PlugCreator)
