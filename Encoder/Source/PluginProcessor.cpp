@@ -503,7 +503,12 @@ void AmbisonicEncoderAudioProcessor::actionListenerCallback(const juce::String &
 
 //==============================================================================
 // This creates new instances of the plugin..
+#if !(JUCE_DONT_EMIT_CREATE_PLUGIN_FILTER)
+
 AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new AmbisonicEncoderAudioProcessor();
 }
+
+#endif
+
