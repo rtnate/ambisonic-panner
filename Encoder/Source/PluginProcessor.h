@@ -123,6 +123,7 @@ private:
     std::unique_ptr<CustomOscTxPresetHelper> customOscTxPresetHelper;
     std::unique_ptr<CustomOscRxPresetHelper> customOscRxPresetHelper;
 	double lastCoefficients[64][64];
+  double gainMemory[64][64];
 	VarDelayBuffer delayBuffers[64];
     AirAbsorbtionFilter airAbsorbtionFilters[64];
     dsp::ProcessSpec iirFilterSpec;

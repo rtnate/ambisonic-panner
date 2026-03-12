@@ -313,8 +313,19 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
 		{
 			double fractionNew = 1.0 / numSamples * iSample;
 			double fractionOld = 1.0 - fractionNew;
-			for (iChannel = 0; iChannel < totalUsedOutputChannels; iChannel++)
-				outputBufferPointers[iChannel][iSample] += sourceGain * masterGainFactor * float(inputData[iSample] * (fractionNew * currentCoefficients[iChannel] + fractionOld * lastCoefficients[iSource][iChannel]));
+      constexpr double beta = 0.98132699;
+      constexpr double alpha = 1.0 - beta;
+      for (iChannel = 0; iChannel < totalUsedOutputChannels; iChannel++)
+      {
+        double chGain = sourceGain * masterGainFactor;
+        double ambGain = fractionNew * currentCoefficients[iChannel] + fractionOld * lastCoefficients[iSource][iChannel];
+        double lastGain = gainMemory[iSource][iChannel];
+        double gain = (chGain * ambGain) * alpha + lastGain * beta;
+        double s = inputData[iSample];
+        outputBufferPointers[iChannel][iSample] += (float)(s * gain);
+        gainMemory[iSource][iChannel] = gain;
+      }
+			//outputBufferPointers[iChannel][iSample] += sourceGain * masterGainFactor * float(inputData[iSample] * (fractionNew * currentCoefficients[iChannel] + fractionOld * lastCoefficients[iSource][iChannel]));
 		}
 
 		// keep coefficients
